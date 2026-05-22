@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Project ENZYME-CRUSH: Interactive Science Lab</title>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
+  <style>
+    /* Custom HUD styling overlaid on top of the canvas for non-VR screens */
+    #game-hud {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #00ffff;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px;
+      border: 2px solid #00ffff;
+      border-radius: 8px;
+      z-index: 10;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-hud">
+    <div>MISSION: DIGESTION CRUSH</div>
+    <div>ZONE: THE MOUTH CAVITY</div>
+    <div>TARGET: COMPLEX CARBOHYDRATE</div>
+    <div>ACTIVE WEAPON: AMYLASE BLAST (NEON CYAN)</div>
+  </div>
+
+  <a-scene>
+    <a-assets>
+      <audio id="click-sound" src="https://cdn.aframe.io/360-image-gallery-boilerplate/audio/click.ogg"></audio>
+    </a-assets>
+
+    <a-entity environment="preset: volcanos; funding: 0.5; dressingAmount: 20; groundColor: #3d0c11; grid: 1x1; gridColor: #ff2b40"></a-entity>
+
+    <a-entity id="rig" position="0 0 4">
+      <a-camera>
+        <a-cursor color="#00ffff" animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 150"></a-cursor>
+      </a-camera>
+      <a-entity laser-controls="hand: left" raycaster="objects: .clickable"></a-entity>
+      <a-entity laser-controls="hand: right" raycaster="objects: .clickable"></a-entity>
+    </a-entity>
+
+    <a-light type="ambient" color="#331122"></a-light>
+    <a-light type="directional" color="#ff0077" position="-1 2 1"></a-light>
+    <a-light type="directional" color="#00ffff" position="2 1 -1"></a-light>
+
+    <a-entity id="starch-target" class="clickable" position="0 2 -3"
+              animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear">
+      
+      <a-sphere radius="0.6" color="#00ffff" material="wireframe: false; roughness: 0.3; metalness: 0.6" 
+                sound="on: click; src: #click-sound">
+      </a-sphere>
+
+      <a-octahedron position="0.9 0.5 0" radius="0.3" color="#00cccc"></a-octahedron>
+      <a-octahedron position="-0.9 -0.5 0" radius="0.3" color="#00cccc"></a-octahedron>
+      <a-octahedron position="0 -0.9 0.5" radius="0.3" color="#00cccc"></a-octahedron>
+      <a-octahedron position="0.5 0.7 -0.6" radius="0.3" color="#00cccc"></a-octahedron>
+    </a-entity>
+
+    <a-entity text="value: TARGET: STARCH MOLECULE.\nUSE AMYLASE POWER TO CRUSH IT INTO MALTOSE!; color: #ffffff; align: center; width: 4" position="0 3.5 -3"></a-entity>
+
+    <a-plane position="-2.5 2 -2.5" rotation="0 30 0" width="1.8" height="1.2" color="#111122" material="opacity: 0.8; transparent: true; border: 2px solid #00ffff">
+      <a-entity text="value: ENZYME INVENTORY\n\n[1] Amylase - READY\n[2] Protease - LOCKED\n[3] Lipase   - LOCKED; color: #00ffff; width: 2.5; xOffset: 0.1"></a-entity>
+    </a-plane>
+
+    <a-cylinder position="-3 0 -4" radius="0.5" height="4" color="#eeeeff" material="roughness: 0.1"></a-cylinder>
+    <a-cylinder position="3 0 -4" radius="0.5" height="4" color="#eeeeff" material="roughness: 0.1"></a-cylinder>
+
+  </a-scene>
+
+  <script>
+    // Register click interaction to handle carbohydrate breakdown mechanics
+    const targetElement = document.getElementById('starch-target');
+    const hudElement = document.getElementById('game-hud');
+    
+    let clickCount = 0;
+
+    targetElement.addEventListener('click', function () {
+      clickCount++;
+      
+      // Scale changes dynamically representing the degradation of physical structure
+      if (clickCount === 1) {
+        targetElement.setAttribute('scale', '0.7 0.7 0.7');
+        hudElement.innerHTML = "<div>MISSION: DIGESTION CRUSH</div><div>ZONE: THE MOUTH CAVITY</div><div>TARGET: STARCH SPLITTING</div><div>STATUS: MALTOSE PRODUCED (Partial Breakdown)</div>";
+      } else if (clickCount === 2) {
+        // Complete structural breakdown animation trigger
+        targetElement.setAttribute('animation', 'property: position; to: 0 -5 -3; dur: 800; easing: easeInBack');
+        hudElement.innerHTML = "<div>MISSION: SUCCESS</div><div>ZONE: ESOPHAGUS TRANSIT</div><div>CARBOHYDRATE FULLY SPLIT!</div><div>NEXT UP: STOMACH CHAMBER (PROTEINS)</div>";
+        
+        // Reset or transition logic simulation delay
+        setTimeout(() => {
+          alert("Level 1 Clear! Starch parsed into simpler chemical structures. Prepare for stomach injection.");
+          targetElement.setAttribute('position', '0 2 -3');
+          targetElement.setAttribute('scale', '1 1 1');
+          targetElement.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear');
+          clickCount = 0;
+          hudElement.innerHTML = "<div>MISSION: DIGESTION CRUSH</div><div>ZONE: THE MOUTH CAVITY</div><div>TARGET: COMPLEX CARBOHYDRATE</div><div>ACTIVE WEAPON: AMYLASE BLAST (NEON CYAN)</div>";
+        }, 3000);
+      }
+    });
+  </script>
+</body>
+</html>
